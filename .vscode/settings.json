@@ -1,0 +1,11 @@
+{
+  "rgbdsz80.includePath": [
+    "src/",
+    "include/"
+  ],
+  "rgbdsz80.formatting.capitalization": {
+    "language": "lower",
+    "language.keyword.preprocessor.include": "upper",
+    "language.keyword.sectiondeclaration": "upper"
+  }
+}
