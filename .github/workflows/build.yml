@@ -15,7 +15,9 @@ jobs:
           mkdir -p bin
           chmod 777 bin
       - name: List files
-        run: ls -al
+        run: |
+          ls -al
+          rgbgfx
       - name: Compile ROM
         run: make
       - name: Upload ROM
