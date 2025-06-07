@@ -1,0 +1,17 @@
+name: Build
+on: push
+jobs:
+  compile-rom:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/gbdev/rgbds:latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Compile ROM
+        run: make
+      - name: Upload ROM
+        uses: actions/upload-artifact@v4
+        with:
+          name: ROM
+          path: maze.gb
