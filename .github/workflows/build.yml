@@ -14,8 +14,8 @@ jobs:
           chmod 777 assets
           mkdir -p bin
           chmod 777 bin
-      - name: Install RGBDS
-        run: /rgbds/.github/scripts/install.sh
+      - name: Update path
+        run: export PATH="/rgbds:$PATH"
       - name: List files
         run: |
           ls -al
