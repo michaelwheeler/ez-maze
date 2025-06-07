@@ -20,7 +20,6 @@ jobs:
       - name: List files
         run: |
           ls -al
-          /rgbds/rgbgfx
       - name: Compile ROM
         run: make
       - name: Upload ROM
