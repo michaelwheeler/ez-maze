@@ -11,7 +11,9 @@ jobs:
       - name: Make output directories
         run: |
           mkdir -p assets
+          chmod 777 assets
           mkdir -p bin
+          chmod 777 bin
       - name: List files
         run: ls -al
       - name: Compile ROM
