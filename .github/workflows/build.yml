@@ -8,12 +8,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: List files
-        run: ls
+      - name: Make output directories
+        run: |
+          mkdir -p assets
+          mkdir -p bin
       - name: Compile ROM
         run: make
       - name: Upload ROM
         uses: actions/upload-artifact@v4
         with:
           name: ROM
-          path: maze.gb
+          path: bin/maze.gb
