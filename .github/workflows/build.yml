@@ -12,6 +12,8 @@ jobs:
         run: |
           mkdir -p assets
           mkdir -p bin
+      - name: List files
+        run: ls -al
       - name: Compile ROM
         run: make
       - name: Upload ROM
