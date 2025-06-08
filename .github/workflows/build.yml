@@ -11,9 +11,7 @@ jobs:
       - name: Make output directories
         run: |
           mkdir -p assets
-          chmod 777 assets
           mkdir -p bin
-          chmod 777 bin
       - name: Install RGBDS
         run: |
           install -s -m 755 /rgbds/rgbasm /rgbds/rgblink /rgbds/rgbfix /rgbds/rgbgfx /usr/local/bin/
