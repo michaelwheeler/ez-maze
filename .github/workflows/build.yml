@@ -17,13 +17,10 @@ jobs:
       - name: Install RGBDS
         run: |
           install -s -m 755 /rgbds/rgbasm /rgbds/rgblink /rgbds/rgbfix /rgbds/rgbgfx /usr/local/bin/
-      - name: List files
-        run: |
-          ls -al
       - name: Compile ROM
         run: make
       - name: Upload ROM
         uses: actions/upload-artifact@v4
         with:
-          name: ROM
+          name: ez-maze
           path: bin/maze.gb
