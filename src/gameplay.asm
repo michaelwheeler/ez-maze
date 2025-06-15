@@ -1,43 +1,25 @@
 INCLUDE "hardware.inc"
 
-SECTION "Header", ROM0[$100]
-	jp EntryPoint
 
-	ds $150 - @, 0 ; Make room for the header
+SECTION "Gameplay", ROM0
 
-
-SECTION "Entry point", ROM0
-
-EntryPoint:
-	; Shut down audio circuitry
-	ld a, 0
-	ld [rNR52], a
-
-WaitVBlank:
-	ld a, [rLY]
-	cp 144
-	jp c, WaitVBlank
-
-	; Turn the LCD off
-	ld a, 0
-	ld [rLCDC], a
-
+InitGameplayState::
 	; Copy the tile data
 	ld de, Tiles
 	ld hl, $9000
-	ld bc, TilesEnd - Tiles
+	ld bc, Tiles.end - Tiles
 	call Memcopy
 
 	; Copy the player tiles
 	ld de, Player
 	ld hl, $8000
-	ld bc, PlayerEnd - Player
+	ld bc, Player.end - Player
 	call Memcopy
 
 	; Copy the tilemap
 	ld de, Tilemap
 	ld hl, $9800
-	ld bc, TilemapEnd - Tilemap
+	ld bc, Tilemap.end - Tilemap
 	call Memcopy
 
 ClearOAM:
@@ -59,29 +41,23 @@ ClearOAM.loop:
 	ld [hli], a
 	ld [hli], a
 
-	; Turn the LCD on
 	ld a, LCDCF_ON | LCDCF_BGON | LCDCF_OBJON
 	ld [rLCDC], a
 
-	; Set the pallette
-	ld a, %11100100
-	ld [rBGP], a
-	ld a, %11100100
-	ld [rOBP0], a
-
 	; Initialize variables
-	ld a, 0
-	ld [wCurKeys], a
-	ld [wNewKeys], a
+	call InitKeys
 
-Main:
+	ret
+
+
+UpdateGameplayState::
 	ld a, [rLY]
 	cp 144
-	jp nc, Main
-WaitVBlank2:
+	jp nc, UpdateGameplayState
+WaitVBlank:
 	ld a, [rLY]
 	cp 144
-	jp c, WaitVBlank2
+	jp c, WaitVBlank
 
 	call UpdateKeys
 
@@ -105,12 +81,12 @@ GoLeft:
 	call GetTileByPixel
 	ld a, [hl]
 	call IsWallTile
-	jp z, Main
+	jp z, UpdateGameplayState
 
 	ld a, [_OAMRAM + 1]
 	sub a, 8
 	ld [_OAMRAM + 1], a
-	jp Main
+	jp UpdateGameplayState
 
 CheckRight:
 	ld a, [wNewKeys]
@@ -131,12 +107,12 @@ GoRight:
 	call GetTileByPixel
 	ld a, [hl]
 	call IsWallTile
-	jp z, Main
+	jp z, UpdateGameplayState
 
 	ld a, [_OAMRAM + 1]
 	add a, 8
 	ld [_OAMRAM + 1], a
-	jp Main
+	jp UpdateGameplayState
 
 CheckUp:
 	ld a, [wNewKeys]
@@ -157,17 +133,17 @@ GoUp:
 	call GetTileByPixel
 	ld a, [hl]
 	call IsWallTile
-	jp z, Main
+	jp z, UpdateGameplayState
 
 	ld a, [_OAMRAM]
 	sub a, 8
 	ld [_OAMRAM], a
-	jp Main
+	jp UpdateGameplayState
 
 CheckDown:
 	ld a, [wNewKeys]
 	and a, PADF_DOWN
-	jp z, Main
+	jp z, UpdateGameplayState
 GoDown:
 	ld a, 1
 	ld [_OAMRAM + 2], a
@@ -183,65 +159,13 @@ GoDown:
 	call GetTileByPixel
 	ld a, [hl]
 	call IsWallTile
-	jp z, Main
+	jp z, UpdateGameplayState
 
 	ld a, [_OAMRAM]
 	add a, 8
 	ld [_OAMRAM], a
 
-	jp Main
-
-
-UpdateKeys:
-	; Poll half the controller
-	ld a, P1F_GET_BTN
-	call .onenibble
-	ld b, a ; B7-4 = 1; B3-0 = unpressed buttons
-
-	; Poll the other half
-	ld a, P1F_GET_DPAD
-	call .onenibble
-	swap a ; A7-4 = unpressed directions; A3-0 = 1
-	xor a, b ; A = pressed buttons + directions
-	ld b, a ; B = pressed buttons + directions
-
-	; And release the controller
-	ld a, P1F_GET_NONE
-	ldh [rP1], a
-
-	; Combine with previous wCurKeys to make wNewKeys
-	ld a, [wCurKeys]
-	xor a, b ; A = keys that changed state
-	and a, b ; A = keys that changed to pressed
-	ld [wNewKeys], a
-	ld a, b
-	ld [wCurKeys], a
-	ret
-
-.onenibble
-	ldh [rP1], a ; switch the key matrix
-	call .knownret ; burn 10 cycles calling a known ret
-	ldh a, [rP1] ; ignore value while waiting for key matrix to settle
-	ldh a, [rP1]
-	ldh a, [rP1] ; this read counts
-	or a, $F0 ; A7-4 = 1; A3-0 = unpressed keys
-.knownret
-	ret
-
-
-; Copy bytes from one area to another
-; @param de: Source
-; @param hl: Destination
-; @param bc: Length
-Memcopy:
-	ld a, [de]
-	ld [hli], a
-	inc de
-	dec bc
-	ld a, b
-	or a, c
-	jp nz, Memcopy
-	ret
+	jp UpdateGameplayState
 
 
 ; Convert a pixel position to a tilemap address
@@ -278,24 +202,19 @@ IsWallTile:
 	ret
 
 
-SECTION "Tile data", ROM0
+SECTION "Gameplay tile data", ROM0
 
 Tiles:
 	INCBIN "assets/maze.2bpp"
-TilesEnd:
+.end
 
 Player:
 	INCBIN "assets/player.2bpp"
-PlayerEnd:
+.end
 
 
-SECTION "Tilemap", ROM0
+SECTION "Gameplay tilemap", ROM0
 
 Tilemap:
 	INCBIN "assets/maze.tilemap"
-TilemapEnd:
-
-
-SECTION "Input variables", WRAM0
-wCurKeys: db
-wNewKeys: db
+.end
