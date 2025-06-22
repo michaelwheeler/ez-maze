@@ -22,3 +22,8 @@ jobs:
         with:
           name: ez-maze
           path: bin/ezmaze.gb
+      - name: Upload web build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ez-maze-web
+          path: bin/web/
