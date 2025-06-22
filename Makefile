@@ -1,4 +1,8 @@
-default: bin/ezmaze.gb
+all: bin/web/ezmaze.gb
+.PHONY: all
+
+rom: bin/ezmaze.gb
+.PHONY: rom
 
 bin/utils.o: src/utils.asm
 	rgbasm -I src/ -I include/ -o bin/utils.o src/utils.asm
@@ -23,3 +27,15 @@ assets/maze.2bpp: src/assets/maze.png
 
 assets/player.2bpp: src/assets/player.png
 	rgbgfx -o assets/player.2bpp -u src/assets/player.png
+
+
+WEB_ASSETS := index.html binjgb.js binjgb.wasm LICENSE.gbstudio simple.css simple.js
+WEB_ASSET_TARGETS := $(addprefix bin/web/,$(WEB_ASSETS))
+
+$(WEB_ASSET_TARGETS): /bin/web/%: src/assets/web/%
+	mkdir -p bin/web/
+	cp src/assets/web/$(notdir $@) $@
+
+bin/web/ezmaze.gb: bin/ezmaze.gb $(WEB_ASSET_TARGETS)
+	mkdir -p bin/web/
+	cp $< $@
