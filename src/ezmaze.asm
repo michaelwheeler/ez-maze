@@ -26,7 +26,7 @@ EntryPoint:
 	ld [rLCDC], a
 
 	; Turn the LCD on
-	ld a, LCDCF_ON | LCDCF_BGON | LCDCF_OBJON
+	ld a, LCDC_ON | LCDC_BG | LCDC_OBJS
 	ld [rLCDC], a
 
 	; Set pallettes
