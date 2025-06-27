@@ -4,16 +4,16 @@ all: bin/web/ezmaze.gb
 rom: bin/ezmaze.gb
 .PHONY: rom
 
-bin/utils.o: src/utils.asm
+bin/utils.o: src/utils.asm include/hardware.inc
 	rgbasm -I src/ -I include/ -o bin/utils.o src/utils.asm
 
-bin/ezmaze.o: src/ezmaze.asm
+bin/ezmaze.o: src/ezmaze.asm include/hardware.inc
 	rgbasm -I src/ -I include/ -o bin/ezmaze.o src/ezmaze.asm
 
-bin/title-screen.o: src/title-screen.asm assets/titlescreen.2bpp
+bin/title-screen.o: src/title-screen.asm assets/titlescreen.2bpp include/hardware.inc
 	rgbasm -I src/ -I include/ -o bin/title-screen.o src/title-screen.asm
 
-bin/gameplay.o: src/gameplay.asm assets/maze.2bpp assets/player.2bpp
+bin/gameplay.o: src/gameplay.asm assets/maze.2bpp assets/player.2bpp include/hardware.inc
 	rgbasm -I src/ -I include/ -o bin/gameplay.o src/gameplay.asm
 
 bin/ezmaze.gb: bin/utils.o bin/title-screen.o bin/gameplay.o bin/ezmaze.o
