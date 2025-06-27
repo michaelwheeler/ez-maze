@@ -23,7 +23,7 @@ InitTitleScreenState::
 	ld bc, TitleScreenTilemap.end - TitleScreenTilemap
 	call Memcopy
 
-	ld a, LCDCF_ON | LCDCF_BGON
+	ld a, LCDC_ON | LCDC_BG
 	ld [rLCDC], a
 	ret
 
@@ -31,7 +31,7 @@ InitTitleScreenState::
 UpdateTitleScreenState::
 	call UpdateKeys
 	ld a, [wCurKeys]
-	and a, PADF_START
+	and a, PAD_START
 	jp z, UpdateTitleScreenState
 
 	ld a, 1

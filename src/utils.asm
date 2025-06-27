@@ -28,7 +28,7 @@ ClearBackgroundLoop:
 	jp nz, ClearBackgroundLoop
 
 	; Turn LCD on
-	ld a, LCDCF_ON | LCDCB_BGON | LCDCB_OBJON
+	ld a, LCDC_ON | LCDC_BG | LCDC_OBJS
 	ld [rLCDC], a
 
 	ret
@@ -59,19 +59,19 @@ InitKeys::
 
 UpdateKeys::
 	; Poll half the controller
-	ld a, P1F_GET_BTN
+	ld a, JOYP_GET_BUTTONS
 	call .onenibble
 	ld b, a ; B7-4 = 1; B3-0 = unpressed buttons
 
 	; Poll the other half
-	ld a, P1F_GET_DPAD
+	ld a, JOYP_GET_CTRL_PAD
 	call .onenibble
 	swap a ; A7-4 = unpressed directions; A3-0 = 1
 	xor a, b ; A = pressed buttons + directions
 	ld b, a ; B = pressed buttons + directions
 
 	; And release the controller
-	ld a, P1F_GET_NONE
+	ld a, JOYP_GET_NONE
 	ldh [rP1], a
 
 	; Combine with previous wCurKeys to make wNewKeys

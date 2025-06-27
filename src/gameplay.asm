@@ -25,14 +25,14 @@ InitGameplayState::
 ClearOAM:
 	ld a, 0
 	ld b, 160
-	ld hl, _OAMRAM
+	ld hl, startof(OAM)
 ClearOAM.loop:
 	ld [hli], a
 	dec b
 	jp nz, ClearOAM.loop
 
 	; Initialize player sprite in OAM
-	ld hl, _OAMRAM
+	ld hl, startof(OAM)
 	ld a, 128 + 16
 	ld [hli], a
 	ld a, 8 + 8
@@ -41,7 +41,7 @@ ClearOAM.loop:
 	ld [hli], a
 	ld [hli], a
 
-	ld a, LCDCF_ON | LCDCF_BGON | LCDCF_OBJON
+	ld a, LCDC_ON | LCDC_BG | LCDC_OBJS
 	ld [rLCDC], a
 
 	; Initialize variables
@@ -63,19 +63,19 @@ WaitVBlank:
 
 CheckLeft:
 	ld a, [wNewKeys]
-	and a, PADF_LEFT
+	and a, PAD_LEFT
 	jp z, CheckRight
 GoLeft:
 	ld a, 0
-	ld [_OAMRAM + 2], a
-	ld a ,[_OAMRAM + 3]
-	or a, OAMF_XFLIP
-	ld [_OAMRAM + 3], a
+	ld [startof(OAM) + 2], a
+	ld a ,[startof(OAM) + 3]
+	or a, OAM_XFLIP
+	ld [startof(OAM) + 3], a
 
-	ld a, [_OAMRAM]
+	ld a, [startof(OAM)]
 	sub a, 16
 	ld c, a
-	ld a, [_OAMRAM + 1]
+	ld a, [startof(OAM) + 1]
 	sub a, 8 + 4
 	ld b, a
 	call GetTileByPixel
@@ -83,25 +83,25 @@ GoLeft:
 	call IsWallTile
 	jp z, UpdateGameplayState
 
-	ld a, [_OAMRAM + 1]
+	ld a, [startof(OAM) + 1]
 	sub a, 8
-	ld [_OAMRAM + 1], a
+	ld [startof(OAM) + 1], a
 	jp UpdateGameplayState
 
 CheckRight:
 	ld a, [wNewKeys]
-	and a, PADF_RIGHT
+	and a, PAD_RIGHT
 	jp z, CheckUp
 GoRight:
 	ld a, 0
-	ld [_OAMRAM + 2], a
+	ld [startof(OAM) + 2], a
 	ld a, 0
-	ld [_OAMRAM + 3], a
+	ld [startof(OAM) + 3], a
 
-	ld a, [_OAMRAM]
+	ld a, [startof(OAM)]
 	sub a, 16
 	ld c, a
-	ld a, [_OAMRAM + 1]
+	ld a, [startof(OAM) + 1]
 	add a, 4
 	ld b, a
 	call GetTileByPixel
@@ -109,25 +109,25 @@ GoRight:
 	call IsWallTile
 	jp z, UpdateGameplayState
 
-	ld a, [_OAMRAM + 1]
+	ld a, [startof(OAM) + 1]
 	add a, 8
-	ld [_OAMRAM + 1], a
+	ld [startof(OAM) + 1], a
 	jp UpdateGameplayState
 
 CheckUp:
 	ld a, [wNewKeys]
-	and a, PADF_UP
+	and a, PAD_UP
 	jp z, CheckDown
 GoUp:
 	ld a, 1
-	ld [_OAMRAM + 2], a
+	ld [startof(OAM) + 2], a
 	ld a, 0
-	ld [_OAMRAM + 3], a
+	ld [startof(OAM) + 3], a
 
-	ld a, [_OAMRAM]
+	ld a, [startof(OAM)]
 	sub a, 16 + 4
 	ld c, a
-	ld a, [_OAMRAM + 1]
+	ld a, [startof(OAM) + 1]
 	sub a, 8
 	ld b, a
 	call GetTileByPixel
@@ -135,25 +135,25 @@ GoUp:
 	call IsWallTile
 	jp z, UpdateGameplayState
 
-	ld a, [_OAMRAM]
+	ld a, [startof(OAM)]
 	sub a, 8
-	ld [_OAMRAM], a
+	ld [startof(OAM)], a
 	jp UpdateGameplayState
 
 CheckDown:
 	ld a, [wNewKeys]
-	and a, PADF_DOWN
+	and a, PAD_DOWN
 	jp z, UpdateGameplayState
 GoDown:
 	ld a, 1
-	ld [_OAMRAM + 2], a
-	ld a, OAMF_YFLIP
-	ld [_OAMRAM + 3], a
+	ld [startof(OAM) + 2], a
+	ld a, OAM_YFLIP
+	ld [startof(OAM) + 3], a
 
-	ld a, [_OAMRAM]
+	ld a, [startof(OAM)]
 	sub a, 4
 	ld c, a
-	ld a, [_OAMRAM + 1]
+	ld a, [startof(OAM) + 1]
 	sub a, 8
 	ld b, a
 	call GetTileByPixel
@@ -161,9 +161,9 @@ GoDown:
 	call IsWallTile
 	jp z, UpdateGameplayState
 
-	ld a, [_OAMRAM]
+	ld a, [startof(OAM)]
 	add a, 8
-	ld [_OAMRAM], a
+	ld [startof(OAM)], a
 
 	jp UpdateGameplayState
 
